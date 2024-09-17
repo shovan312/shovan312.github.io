@@ -65,7 +65,7 @@ band4.position.x = 3/2
 
 ///////
 const loader = new FontLoader();
-loader.load('./three/examples/fonts/helvetiker_bold.typeface.json', function (response:any) {
+loader.load('./dist/fonts/helvetiker_bold.typeface.json', function (response:any) {
     let font = response;
     let textGeo = new TextGeometry("Welcome!", {
         font: font,
