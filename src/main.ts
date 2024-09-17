@@ -1,11 +1,11 @@
 //@ts-ignore
-import * as THREE from './dist/three/build/three.module.js'
+import * as THREE from './three/build/three.module.js'
 //@ts-ignore
-import {OrbitControls} from "./dist/three/examples/jsm/controls/OrbitControls.js";
+import {OrbitControls} from "./three/examples/jsm/controls/OrbitControls.js";
 //@ts-ignore
-import {FontLoader} from "./dist/three/examples/jsm/loaders/FontLoader.js";
+import {FontLoader} from "./three/examples/jsm/loaders/FontLoader.js";
 //@ts-ignore
-import {TextGeometry} from "./dist/three/examples/jsm/geometries/TextGeometry.js"
+import {TextGeometry} from "./three/examples/jsm/geometries/TextGeometry.js"
 
 // Scene and Camera Setup
 const scene = new THREE.Scene();
@@ -65,7 +65,7 @@ band4.position.x = 3/2
 
 ///////
 const loader = new FontLoader();
-loader.load('./dist/three/examples/fonts/helvetiker_bold.typeface.json', function (response:any) {
+loader.load('./three/examples/fonts/helvetiker_bold.typeface.json', function (response:any) {
     let font = response;
     let textGeo = new TextGeometry("Welcome!", {
         font: font,
