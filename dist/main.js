@@ -50,7 +50,7 @@ band3.add(band4);
 band4.position.x = 3 / 2;
 ///////
 const loader = new FontLoader();
-loader.load('./three/examples/fonts/helvetiker_bold.typeface.json', function (response) {
+loader.load('./dist/fonts/helvetiker_bold.typeface.json', function (response) {
     let font = response;
     let textGeo = new TextGeometry("Welcome!", {
         font: font,
