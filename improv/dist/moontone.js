@@ -1,14 +1,16 @@
 import { chromatic_map, majorScale, modeMapFifths, Changes, TwoFiveArgs, SubDomArgs, } from './config.js';
 import { Chord } from './chord.js';
-import { majorNotes, makeChords, positiveMod } from './common.js';
-// let isPlaying = false;
-// const synth = new Tone.Synth().toDestination();
+import { majorChords, majorNotes, makeChords, positiveMod } from './common.js';
+//@ts-ignore
+import Tone from './Tone.js';
+let isPlaying = false;
+const synth = new Tone.PolySynth(Tone.Synth).toDestination();
 document.getElementById("play-btn").addEventListener("click", () => {
-    //   if (Tone.context.state !== "running") {
-    //     Tone.start();
-    runAnim();
-    //     runAudio()
-    //   }
+    if (Tone.context.state !== "running") {
+        Tone.start();
+        runAnim();
+        runAudio();
+    }
 });
 /////////////
 function getRandomChords() {
@@ -88,7 +90,7 @@ function modifyChords(chordsArray, targetIndex, change, args) {
 }
 ///////////
 //millis per bar
-let mpb = 480; //16 8th notes @ 100bpm
+let mpb = 600; //1 bar @ 100bpm
 mpb *= 4;
 let songChords = [];
 let songSections = []; //How to add notes for doubleChords?
@@ -121,8 +123,6 @@ function animate() {
     for (let i = 0; i < gridItems.length; i++) {
         gridItems[i].style.backgroundColor = "#3498db";
         // outsideChordsArr.includes(i + songLength*Math.floor(index/songLength)) ? gridItems[i].style.backgroundColor = "#103166" : gridItems[i].style.backgroundColor = "#3498db";
-        // let auxChord = doubleChordsArr.find(function(x) {return x.index == i + songLength*Math.floor(index/songLength)})
-        // let auxChordName = auxChord == undefined ? "" : auxChord.chord.getChordName()
         let barString = "";
         songChords[i + songLength * Math.floor(index / songLength)].forEach((chord) => barString += chord.getChordName());
         gridItems[i].innerHTML = barString;
@@ -137,22 +137,25 @@ function runAnim() {
     start = Date.now();
     animate();
 }
-// function runAudio() {
-//     let melody = [
-//         { note: "E5", duration: "8n", timing: 0 },
-//         { note: "D#5", duration: "8n", timing: 0.25 },
-//         { note: "D5", duration: "8n", timing: 0.5 }
-//     ];
-//     let step = mpb
-//     for(let i=0; i<10; i++) {
-//         melody.push({note: chordsArr[i].getChordName()[0] + "5", duration: "8n"})
-//         console.log({note: chordsArr[i].getChordName()[0] + "5", duration: "16n", timing: Number(0.001*i*mpb)})
-//     }
-//     melody.forEach(tune => {
-//       // const now = Tone.now()
-//       synth.triggerAttackRelease(tune.note, tune.duration, tune.timing)
-// })
-// }
+function runAudio() {
+    let melody = [];
+    for (let i = 0; i < 16; i++) {
+        let currChord = songChords[i][0];
+        let chordNotes = majorNotes[currChord.root][currChord.degree];
+        let first4Notes = majorChords[currChord.root][chordNotes].slice(0, 4);
+        first4Notes = first4Notes.map(x => chromatic_map[x]);
+        melody.push({ time: "0:" + i + "", note: first4Notes[0] + '4', duration: '4n' });
+        melody.push({ time: "0:" + i + "", note: first4Notes[2] + '4', duration: '4n' });
+        melody.push({ time: "0:" + i + "", note: first4Notes[1] + '5', duration: '4n' });
+        melody.push({ time: "0:" + i + "", note: first4Notes[3] + '5', duration: '4n' });
+    }
+    Tone.Transport.bpm.value = 25;
+    melody.forEach(({ time, note, duration }) => {
+        synth.triggerAttackRelease(note, duration, time);
+    });
+    // Start the transport to trigger the scheduled events
+    Tone.Transport.start();
+}
 ////////
 function getSong(songName) {
     let chordsArr = [], rhythmSections = [];
