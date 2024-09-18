@@ -146,8 +146,6 @@ function animate() {
         gridItems[i].style.backgroundColor = "#3498db"
         // outsideChordsArr.includes(i + songLength*Math.floor(index/songLength)) ? gridItems[i].style.backgroundColor = "#103166" : gridItems[i].style.backgroundColor = "#3498db";
         
-        // let auxChord = doubleChordsArr.find(function(x) {return x.index == i + songLength*Math.floor(index/songLength)})
-        // let auxChordName = auxChord == undefined ? "" : auxChord.chord.getChordName()
         let barString = ""
         songChords[i + songLength*Math.floor(index/songLength)].forEach((chord:Chord) => barString += chord.getChordName())
 
