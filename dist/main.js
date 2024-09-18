@@ -86,27 +86,18 @@ const mouse = new THREE.Vector2();
 // Set up a mouse move event listener
 window.addEventListener('mousemove', onMouseMove, false);
 function onMouseMove(event) {
-    // Convert mouse coordinates to normalized device coordinates (NDC)
     mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
     mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    // Update the raycaster with the camera and mouse position
     raycaster.setFromCamera(mouse, camera);
-    // Define the objects to check for intersection (e.g., scene.children)
     const intersects = raycaster.intersectObjects(scene.children);
-    // If there is at least one intersection, handle it
     if (intersects.length > 0) {
-        // Get the first intersected object
         const intersectedObject = intersects[0].object;
-        // Do something with the intersected object (e.g., change its color)
-        // intersectedObject.material.color.set(0xff0000); // Highlight red
         intersectedObject.position.z += 0.1;
         console.log(intersectedObject);
     }
 }
-// You can also add a click event listener
 window.addEventListener('click', onClick, false);
 function onClick(event) {
-    // Perform the same raycasting check as in onMouseMove
     raycaster.setFromCamera(mouse, camera);
     const intersects = raycaster.intersectObjects(scene.children);
     if (intersects.length > 0) {
