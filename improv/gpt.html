@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Improv</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      height: 100vh;
+      margin: 0;
+      background-color: #212121;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(4, 100px);
+      gap: 5px;
+      margin-top: 5px;
+    }
+
+    .grid-item {
+      width: 100px;
+      height: 100px;
+      background-color: #3498db;
+      transition: background-color 0.3s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .grid-item:hover {
+      background-color: #e74c3c;
+    }
+     .grid-item {
+      font-weight: bold;
+      color: black;
+      text-align: center;
+      margin: 0;
+      font-size: 25px;
+    }
+    .big-text {
+      font-size: 24px; /* Change the font size as needed */
+      color: white;
+      /*font-weight: bold;*/
+      margin-top: 20px;
+    }
+    small {
+      font-size: 20px; /* Adjust the font size as needed */
+      display: block; /* Ensure the small text is on a new line */
+    }
+  </style>
+</head>
+<body>
+  <div id="main-grid">
+  </div>
+  <div class="big-text" id="notes"></div>
+  
+</body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" integrity="sha512-jduERlz7En1IUZR54bqzpNI64AbffZWR//KJgF71SJ8D8/liKFZ+s1RxmUmB+bhCnIfzebdZsULwOrbVB5f3nQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<button id="play-btn">PLAY</button>
+<script type="text/javascript" src="./moontone.js"></script>
+</html>
