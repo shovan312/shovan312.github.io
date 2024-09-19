@@ -89,10 +89,41 @@
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" integrity="sha512-jduERlz7En1IUZR54bqzpNI64AbffZWR//KJgF71SJ8D8/liKFZ+s1RxmUmB+bhCnIfzebdZsULwOrbVB5f3nQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
 <div id="controls" class="button-container">
 <button id="play-pause-btn" class="icon-button"><i id="play-pause" class="fas fa-play"></i></button>
-<!-- <button id="pause-btn" class="icon-button"><i class="fas fa-pause"></i></button> -->
-<!-- <button id="stop-btn" class="icon-button"><i class="fas fa-stop"></i></button> -->
+<button id="stop-btn" class="icon-button"><i class="fas fa-stop"></i></button>
 <button id="metro-btn" class="icon-button"><i class="fas fa-metro"></i></button>
 </div>
+
+<label for="ddSongName">Choose an option:</label>
+    <select id="ddSongName">
+        <option value="Moon">Moon</option>
+        <option value="Spain">Spain</option>
+        <option value="Autumn">Autumn</option>
+        <option value="Random">Random</option>
+    </select>
+
+    <br><br>
+
+    <label for="ddKey">Choose an option:</label>
+    <select id="ddKey">
+        <option value=0>C</option>
+        <option value=1>C#</option>
+        <option value=2>D</option>
+        <option value=3>D#</option>
+        <option value=4>E</option>
+        <option value=5>F</option>
+        <option value=6>F#</option>
+        <option value=7>G</option>
+        <option value=8>G#</option>
+        <option value=9>A</option>
+        <option value=10>A#</option>
+        <option value=11>B</option>
+    </select>
+
+    <br><br>
+
+    <!-- Slider -->
+    <label for="slider">Adjust the slider:</label>
+    <input type="range" id="slider" min="20" max="100" value="50">
 
 <script type="module" src="/improv/dist/moontone.js"></script>
 </html>

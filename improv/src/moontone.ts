@@ -94,74 +94,74 @@ function modifyChords(chordsArray:Chord[][], targetIndex:number, change:number, 
     }
 }
 
+let tempo=50, mpb=0, songChords:Chord[][] = [], melody:any[]=[], mainGrid:HTMLElement, gridItems:HTMLCollection, songLength=0,key=0, songName="Moon";
+function initSong(tmp:number=50, songName:string="Moon", key:number=0) {
+    tempo = tmp
+    mpb = 60*1000/tempo; //1 bar @ 100bpm
 
+    let song = getSong(songName, key)
+    songChords = song.chordsArr
+    let songSections:number[] = song.rhythmSections
+    melody = createMelody(songChords)
 
-///////////
-//millis per bar
-let tempo = 50
-let mpb = 60*1000/tempo; //1 bar @ 100bpm
-// mpb *= 4;
-
-let songChords:Chord[][] = []; let songSections:number[] = []; //How to add notes for doubleChords?
-
-const song = getSong("Moon")
-songChords = song.chordsArr
-songSections = song.rhythmSections
-const melody = createMelody(songChords)
-// getSong()
-// getSong("Spain")
-// getSong("Autumn")
-
-
-////////////
-
-let mainGrid = document.getElementById('main-grid')!
-
-for(let i=0; i<songSections.length; i++) {
-    mainGrid.innerHTML += `<div id="row-`+i+`" class="grid-container"></div>`
-    let gridRow = document.getElementById('row-'+i)!
-    gridRow.style.display = "grid"
-    gridRow.style.gridTemplateColumns = "repeat("+songSections[i]+", 100px)"
-    for(let j=0; j<songSections[i]; j++) {
-        gridRow.innerHTML += "<div class='grid-item'></div>"
-    }
-}
-
-let gridItems = document.getElementsByClassName('grid-item') as HTMLCollectionOf<HTMLElement>
-let songLength = songSections.reduce((a, c)=>{return a+c}, 0)
-let hasStarted = false, isPlaying = false, start = 0, paused = 0, netPaused = 0, lastPaused = 0
-function animate() {
-    if (!isPlaying) {paused = Date.now() - lastPaused; requestAnimationFrame(animate)}
-    else {
-        const millis = (Date.now() - start - netPaused);
-        const index = Math.floor(millis/mpb);
-        const indexLength = songChords[index].length
-        const subIndex = Math.floor((millis/mpb - index)*indexLength);
-        
-        let currRootNote = songChords[index][subIndex].root
-        let currScaleDegree = songChords[index][subIndex].degree
-
-        for(let i=0; i<gridItems.length; i++) {
-            gridItems[i].style.backgroundColor = "#3498db"
-            // outsideChordsArr.includes(i + songLength*Math.floor(index/songLength)) ? gridItems[i].style.backgroundColor = "#103166" : gridItems[i].style.backgroundColor = "#3498db";
-            
-            let barString = ""
-            songChords[i + songLength*Math.floor(index/songLength)].forEach((chord:Chord) => barString += chord.getChordName())
-
-            gridItems[i].innerHTML = barString
+    mainGrid = document.getElementById('main-grid')!
+    mainGrid.innerHTML = ""
+    for(let i=0; i<songSections.length; i++) {
+        mainGrid.innerHTML += `<div id="row-`+i+`" class="grid-container"></div>`
+        let gridRow = document.getElementById('row-'+i)!
+        gridRow.style.display = "grid"
+        gridRow.style.gridTemplateColumns = "repeat("+songSections[i]+", 100px)"
+        for(let j=0; j<songSections[i]; j++) {
+            gridRow.innerHTML += "<div class='grid-item'></div>"
         }
-        gridItems[index % songLength].style.backgroundColor = "#e74c3c";
-
-        document.getElementById('notes')!.innerHTML = songChords[index].toString();
-        document.getElementById('notes')!.innerHTML += "</br></br>" + songChords[index+1].toString();
-        requestAnimationFrame(animate)
     }
+    gridItems = document.getElementsByClassName('grid-item') as HTMLCollectionOf<HTMLElement>
+    songLength = songSections.reduce((a, c)=>{return a+c}, 0)
+}
+initSong()
+let isAnimating = false, animationFrameId= 0, isPlaying = false, start = 0, paused = 0, netPaused = 0, lastPaused = 0
+function animateWrapper() {
+    function animate() { 
+        if (!isAnimating) {
+            for(let i=0; i<gridItems.length; i++) {
+                (gridItems[i] as HTMLElement).style.backgroundColor = "#3498db"
+            }
+            (gridItems[0] as HTMLElement).style.backgroundColor = "#e74c3c";
+            cancelAnimationFrame(animationFrameId)
+            return
+        }
+        if (!isPlaying) {paused = Date.now() - lastPaused; requestAnimationFrame(animate)}
+        else {
+            const millis = (Date.now() - start - netPaused);
+            const index = Math.floor(millis/mpb);
+            const indexLength = songChords[index].length
+            const subIndex = Math.floor((millis/mpb - index)*indexLength);
+            
+            let currRootNote = songChords[index][subIndex].root
+            let currScaleDegree = songChords[index][subIndex].degree
+
+            for(let i=0; i<gridItems.length; i++) {
+                (gridItems[i] as HTMLElement).style.backgroundColor = "#3498db"
+                // outsideChordsArr.includes(i + songLength*Math.floor(index/songLength)) ? gridItems[i].style.backgroundColor = "#103166" : gridItems[i].style.backgroundColor = "#3498db";
+                
+                let barString = ""
+                songChords[i + songLength*Math.floor(index/songLength)].forEach((chord:Chord) => barString += chord.getChordName())
+
+                gridItems[i].innerHTML = barString
+            }
+            (gridItems[index % songLength] as HTMLElement).style.backgroundColor = "#e74c3c";
+
+            document.getElementById('notes')!.innerHTML = songChords[index].toString();
+            document.getElementById('notes')!.innerHTML += "</br></br>" + songChords[index+1].toString();
+            animationFrameId = requestAnimationFrame(animate)
+        }
+    }
+    animate()
 }
 
 function runAnim() {
     start = Date.now();
-    isPlaying = true;
-    animate()
+    animateWrapper()
 }
 
 function createMelody(songChords){
@@ -219,19 +219,9 @@ function pauseAnim() {
     lastPaused = Date.now()
 }
 
-// document.getElementById("play-pause-btn")!.addEventListener("click", () => {
-//     if (Tone.context.state !== "running") {
-//         Tone.start();
-//         runAnim()
-//         runAudio(melody, synth)
-
-//         document.getElementById("play-pause")
-//     }
-// })
-
 document.getElementById("play-pause-btn").addEventListener("click", () => {
-    if (!hasStarted) {
-        hasStarted = true;
+    if (!isAnimating) {
+        isAnimating = true;
         isPlaying = true;
         Tone.start();
         runAnim()
@@ -254,9 +244,45 @@ document.getElementById("play-pause-btn").addEventListener("click", () => {
     }
 })
 
+document.getElementById("stop-btn").addEventListener("click", stopPlayback);
+function stopPlayback() {
+    isAnimating = false;
+    document.getElementById("play-pause").setAttribute("class", "fas fa-play")
+    Tone.Transport.stop();
+    Tone.Transport.cancel()
+}
+
+document.getElementById("ddSongName").addEventListener("change", () => {
+    const dropdown = document.getElementById("ddSongName") as HTMLOptionElement;
+    const selectedValue = dropdown.value;
+    
+    stopPlayback()
+    songName = selectedValue
+    initSong(tempo, songName, key)
+})
+
+
+document.getElementById("slider").addEventListener("mouseup", () => {
+    const slider = document.getElementById("slider") as HTMLOptionElement;
+    const sliderValue = slider.value;
+    
+    stopPlayback()
+    tempo = parseInt(sliderValue, 10)
+    initSong(tempo, songName, key)
+})
+
+document.getElementById("ddKey").addEventListener("change", () => {
+    const dropdown = document.getElementById("ddKey") as HTMLOptionElement;
+    const selectedValue = dropdown.value;
+    
+    stopPlayback()
+    key = parseInt(selectedValue, 10)
+    initSong(tempo, songName, key)
+})
+
 ////////
 
-function getSong(songName) {
+function getSong(songName:string, key:number) {
     let chordsArr = [], rhythmSections = [];
     if (songName == undefined) {
         //randomize everything
@@ -272,7 +298,7 @@ function getSong(songName) {
         let form = songs["Moon"];
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < form.length; j++) {
-                chordsArr.push([new Chord(form[j][0].root, form[j][0].degree)]);
+                chordsArr.push([new Chord(positiveMod(form[j][0].root + key, 12), form[j][0].degree)]);
             }
         }
         let newMode = 3;
@@ -291,7 +317,7 @@ function getSong(songName) {
         let form = songs["Spain"]
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < form.length; j++) {
-                chordsArr.push([new Chord(form[j][0].root, form[j][0].degree)]);
+                chordsArr.push([new Chord(positiveMod(form[j][0].root + (key - 2), 12), form[j][0].degree)]);
             }
         }
         rhythmSections = [4, 4, 4]
@@ -301,7 +327,7 @@ function getSong(songName) {
         let form = songs["Autumn"]
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < form.length; j++) {
-                chordsArr.push([new Chord(form[j][0].root, form[j][0].degree)]);
+                chordsArr.push([new Chord(positiveMod(form[j][0].root + (key + 2), 12), form[j][0].degree)]);
             }
         }
         modifyChords(chordsArr, 28, Changes.TwoFive, [TwoFiveArgs.TritoneTwoFive])
