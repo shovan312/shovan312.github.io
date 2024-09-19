@@ -4,6 +4,7 @@
   <title>Improv</title>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     body {
       display: flex;
@@ -53,15 +54,45 @@
       font-size: 20px; /* Adjust the font size as needed */
       display: block; /* Ensure the small text is on a new line */
     }
+    .button-container {
+        display: flex;
+        justify-content: center; /* Aligns buttons horizontally */
+        gap: 20px; /* Adds space between buttons */
+    }
+
+    .icon-button {
+        background-color: transparent; /* No background for a clean look */
+        border: none; /* Removes button border */
+        font-size: 44px; /* Icon size */
+        cursor: pointer; /* Changes cursor to pointer */
+        padding: 10px;
+        color: #000; /* Default icon color */
+    }
+
+    .icon-button:focus {
+        outline: none; /* Removes focus outline */
+    }
+
+    /* Optional: hover effect */
+    .icon-button:hover {
+        color: #007BFF; /* Changes icon color on hover */
+    }
   </style>
 </head>
 <body>
   <div id="main-grid">
   </div>
+
   <div class="big-text" id="notes"></div>
   
 </body>
 <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js" integrity="sha512-jduERlz7En1IUZR54bqzpNI64AbffZWR//KJgF71SJ8D8/liKFZ+s1RxmUmB+bhCnIfzebdZsULwOrbVB5f3nQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> -->
-<button id="play-btn">PLAY</button>
+<div id="controls" class="button-container">
+<button id="play-pause-btn" class="icon-button"><i id="play-pause" class="fas fa-play"></i></button>
+<!-- <button id="pause-btn" class="icon-button"><i class="fas fa-pause"></i></button> -->
+<!-- <button id="stop-btn" class="icon-button"><i class="fas fa-stop"></i></button> -->
+<button id="metro-btn" class="icon-button"><i class="fas fa-metro"></i></button>
+</div>
+
 <script type="module" src="/improv/dist/moontone.js"></script>
 </html>

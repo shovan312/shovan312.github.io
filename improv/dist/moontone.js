@@ -3,15 +3,8 @@ import { Chord } from './chord.js';
 import { majorChords, majorNotes, makeChords, positiveMod } from './common.js';
 //@ts-ignore
 import Tone from './Tone.js';
-let isPlaying = false;
-const synth = new Tone.PolySynth(Tone.Synth).toDestination();
-document.getElementById("play-btn").addEventListener("click", () => {
-    if (Tone.context.state !== "running") {
-        Tone.start();
-        runAnim();
-        runAudio();
-    }
-});
+import { songs } from './songs.js';
+import { synth } from './sounds.js';
 /////////////
 function getRandomChords() {
     const randomArray = [];
@@ -90,13 +83,15 @@ function modifyChords(chordsArray, targetIndex, change, args) {
 }
 ///////////
 //millis per bar
-let mpb = 600; //1 bar @ 100bpm
-mpb *= 4;
+let tempo = 50;
+let mpb = 60 * 1000 / tempo; //1 bar @ 100bpm
+// mpb *= 4;
 let songChords = [];
 let songSections = []; //How to add notes for doubleChords?
 const song = getSong("Moon");
 songChords = song.chordsArr;
 songSections = song.rhythmSections;
+const melody = createMelody(songChords);
 // getSong()
 // getSong("Spain")
 // getSong("Autumn")
@@ -113,49 +108,114 @@ for (let i = 0; i < songSections.length; i++) {
 }
 let gridItems = document.getElementsByClassName('grid-item');
 let songLength = songSections.reduce((a, c) => { return a + c; }, 0);
+let hasStarted = false, isPlaying = false, start = 0, paused = 0, netPaused = 0, lastPaused = 0;
 function animate() {
-    const millis = (Date.now() - start);
-    const index = Math.floor(millis / mpb);
-    const indexLength = songChords[index].length;
-    const subIndex = Math.floor((millis / mpb - index) * indexLength);
-    let currRootNote = songChords[index][subIndex].root;
-    let currScaleDegree = songChords[index][subIndex].degree;
-    for (let i = 0; i < gridItems.length; i++) {
-        gridItems[i].style.backgroundColor = "#3498db";
-        // outsideChordsArr.includes(i + songLength*Math.floor(index/songLength)) ? gridItems[i].style.backgroundColor = "#103166" : gridItems[i].style.backgroundColor = "#3498db";
-        let barString = "";
-        songChords[i + songLength * Math.floor(index / songLength)].forEach((chord) => barString += chord.getChordName());
-        gridItems[i].innerHTML = barString;
+    if (!isPlaying) {
+        paused = Date.now() - lastPaused;
+        requestAnimationFrame(animate);
     }
-    gridItems[index % songLength].style.backgroundColor = "#e74c3c";
-    document.getElementById('notes').innerHTML = songChords[index].toString();
-    document.getElementById('notes').innerHTML += "</br></br>" + songChords[index + 1].toString();
-    requestAnimationFrame(animate);
+    else {
+        const millis = (Date.now() - start - netPaused);
+        const index = Math.floor(millis / mpb);
+        const indexLength = songChords[index].length;
+        const subIndex = Math.floor((millis / mpb - index) * indexLength);
+        let currRootNote = songChords[index][subIndex].root;
+        let currScaleDegree = songChords[index][subIndex].degree;
+        for (let i = 0; i < gridItems.length; i++) {
+            gridItems[i].style.backgroundColor = "#3498db";
+            // outsideChordsArr.includes(i + songLength*Math.floor(index/songLength)) ? gridItems[i].style.backgroundColor = "#103166" : gridItems[i].style.backgroundColor = "#3498db";
+            let barString = "";
+            songChords[i + songLength * Math.floor(index / songLength)].forEach((chord) => barString += chord.getChordName());
+            gridItems[i].innerHTML = barString;
+        }
+        gridItems[index % songLength].style.backgroundColor = "#e74c3c";
+        document.getElementById('notes').innerHTML = songChords[index].toString();
+        document.getElementById('notes').innerHTML += "</br></br>" + songChords[index + 1].toString();
+        requestAnimationFrame(animate);
+    }
 }
-let start = 0;
 function runAnim() {
     start = Date.now();
+    isPlaying = true;
     animate();
 }
-function runAudio() {
+function createMelody(songChords) {
     let melody = [];
     for (let i = 0; i < 16; i++) {
-        let currChord = songChords[i][0];
-        let chordNotes = majorNotes[currChord.root][currChord.degree];
-        let first4Notes = majorChords[currChord.root][chordNotes].slice(0, 4);
-        first4Notes = first4Notes.map(x => chromatic_map[x]);
-        melody.push({ time: "0:" + i + "", note: first4Notes[0] + '4', duration: '4n' });
-        melody.push({ time: "0:" + i + "", note: first4Notes[2] + '4', duration: '4n' });
-        melody.push({ time: "0:" + i + "", note: first4Notes[1] + '5', duration: '4n' });
-        melody.push({ time: "0:" + i + "", note: first4Notes[3] + '5', duration: '4n' });
+        let currBar = songChords[i];
+        if (currBar.length == 1) {
+            let currChord = songChords[i][0];
+            let chordNotes = majorNotes[currChord.root][currChord.degree];
+            let first4Notes = majorChords[currChord.root][chordNotes].slice(0, 4);
+            first4Notes = first4Notes.map(x => chromatic_map[x]);
+            melody.push({ time: "0:" + i + "", note: first4Notes[0] + '4', duration: '4n' });
+            melody.push({ time: "0:" + i + "", note: first4Notes[2] + '4', duration: '4n' });
+            melody.push({ time: "0:" + i + "", note: first4Notes[1] + '4', duration: '4n' });
+            melody.push({ time: "0:" + i + "", note: first4Notes[3] + '4', duration: '4n' });
+        }
+        else {
+            for (let j = 0; j < currBar.length; j++) {
+                let currChord = songChords[i][j];
+                let chordNotes = majorNotes[currChord.root][currChord.degree];
+                let first4Notes = majorChords[currChord.root][chordNotes].slice(0, 4);
+                first4Notes = first4Notes.map(x => chromatic_map[x]);
+                melody.push({ time: "0:" + i + ":" + Math.floor(j / currBar.length * 4) + "", note: first4Notes[0] + '4', duration: 4 * currBar.length + 'n' });
+                melody.push({ time: "0:" + i + ":" + Math.floor(j / currBar.length * 4) + "", note: first4Notes[2] + '4', duration: 4 * currBar.length + 'n' });
+                melody.push({ time: "0:" + i + ":" + Math.floor(j / currBar.length * 4) + "", note: first4Notes[1] + '4', duration: 4 * currBar.length + 'n' });
+                melody.push({ time: "0:" + i + ":" + Math.floor(j / currBar.length * 4) + "", note: first4Notes[3] + '4', duration: 4 * currBar.length + 'n' });
+            }
+        }
     }
-    Tone.Transport.bpm.value = 25;
-    melody.forEach(({ time, note, duration }) => {
-        synth.triggerAttackRelease(note, duration, time);
-    });
-    // Start the transport to trigger the scheduled events
+    return melody;
+}
+function runAudio(melody, synth) {
+    Tone.Transport.bpm.value = tempo;
+    Tone.Transport.loop = false;
+    const part = new Tone.Part((time, event) => {
+        synth.triggerAttackRelease(event.note, event.duration, time);
+    }, melody);
+    part.loop = 2;
+    part.loopEnd = '10m';
+    part.start();
     Tone.Transport.start();
 }
+function pauseAudio() {
+    Tone.Transport.pause();
+}
+function pauseAnim() {
+    lastPaused = Date.now();
+}
+// document.getElementById("play-pause-btn")!.addEventListener("click", () => {
+//     if (Tone.context.state !== "running") {
+//         Tone.start();
+//         runAnim()
+//         runAudio(melody, synth)
+//         document.getElementById("play-pause")
+//     }
+// })
+document.getElementById("play-pause-btn").addEventListener("click", () => {
+    if (!hasStarted) {
+        hasStarted = true;
+        isPlaying = true;
+        Tone.start();
+        runAnim();
+        runAudio(melody, synth);
+        document.getElementById("play-pause").setAttribute("class", "fas fa-pause");
+        return;
+    }
+    if (isPlaying) {
+        document.getElementById("play-pause").setAttribute("class", "fas fa-play");
+        isPlaying = false;
+        pauseAudio();
+        pauseAnim();
+    }
+    else {
+        document.getElementById("play-pause").setAttribute("class", "fas fa-pause");
+        isPlaying = true;
+        netPaused += paused;
+        Tone.Transport.start();
+    }
+});
 ////////
 function getSong(songName) {
     let chordsArr = [], rhythmSections = [];
@@ -170,87 +230,41 @@ function getSong(songName) {
         chordsArr = form;
     }
     else if (songName == "Moon") {
-        let form = [
-            [new Chord(0, 5)], [new Chord(0, 1)], [new Chord(0, 4)], [new Chord(0, 0)],
-            [new Chord(0, 3)], [new Chord(0, 6)], [new Chord(0, 2)], [new Chord(0, 5)],
-            [new Chord(0, 1)], [new Chord(0, 4)], [new Chord(0, 0)], [new Chord(0, 5)],
-            [new Chord(0, 1)], [new Chord(0, 4)], [new Chord(0, 0)], [new Chord(0, 6)],
-        ];
+        let form = songs["Moon"];
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < form.length; j++) {
                 chordsArr.push([new Chord(form[j][0].root, form[j][0].degree)]);
             }
         }
-        // let newMode = 3
-        // modifyRandomChords(chordsArr, 6, Changes.Dominant);
-        // modifyRandomChords(chordsArr, 9, Changes.ModalInterchange, [newMode]);
-        // modifyRandomChords(chordsArr, 10, Changes.ModalInterchange, [newMode]);
-        // modifyRandomChords(chordsArr, 11, Changes.ModalInterchange, [newMode]);
-        // modifyRandomChords(chordsArr, 19, Changes.ModalInterchange, [modeOrder["Lydian"] - 1]);
-        // modifyRandomChords(chordsArr, 22, Changes.Dominant);
+        let newMode = 3;
+        // modifyChords(chordsArr, 9, Changes.ModalInterchange, [newMode]);
+        // modifyChords(chordsArr, 10, Changes.ModalInterchange, [newMode]);
+        // modifyChords(chordsArr, 11, Changes.ModalInterchange, [newMode]);
         modifyChords(chordsArr, 7, Changes.Dominant, [SubDomArgs.KeepPrevious]);
         modifyChords(chordsArr, 15, Changes.Dominant, [SubDomArgs.KeepPrevious]);
         // modifyChords(chordsArr, 3, Changes.TwoFive, [TwoFiveArgs.TritoneTwoFive])
-        // modifyRandomChords(chordsArr, 2, Changes.TwoFive, [TwoFiveArgs.TritoneTwoFive])
+        // modifyChords(chordsArr, 2, Changes.TwoFive, [TwoFiveArgs.TritoneTwoFive])
         rhythmSections = [4, 4, 4, 4];
     }
     else if (songName == "Spain") {
-        // chordsArr = [
-        //     new Chord(2, 3),new Chord(2, 3),new Chord(11, 4),new Chord(11, 4),
-        //     new Chord(2, 1),new Chord(2, 4),new Chord(2, 0),new Chord(2, 3),
-        //     new Chord(6, 4),new Chord(11, 4),new Chord(2, 5),new Chord(4, 4),
-        //     new Chord(2, 3),new Chord(2, 3),new Chord(11, 4),new Chord(11, 4),
-        //     new Chord(2, 1),new Chord(2, 4),new Chord(2, 0),new Chord(2, 3),
-        //     new Chord(6, 4),new Chord(11, 4),new Chord(2, 5),new Chord(4, 4),
-        //     new Chord(2, 3),new Chord(2, 3),new Chord(11, 4),new Chord(11, 4),
-        //     new Chord(2, 1),new Chord(2, 4),new Chord(2, 0),new Chord(2, 3),
-        //     new Chord(6, 4),new Chord(11, 4),new Chord(2, 5),new Chord(4, 4),
-        //     new Chord(2, 3),new Chord(2, 3),new Chord(11, 4),new Chord(11, 4),
-        //     new Chord(2, 1),new Chord(2, 4),new Chord(2, 0),new Chord(2, 3),
-        //     new Chord(6, 4),new Chord(11, 4),new Chord(2, 5),new Chord(4, 4),
-        //     new Chord(2, 3),new Chord(2, 3),new Chord(11, 4),new Chord(11, 4),
-        //     new Chord(2, 1),new Chord(2, 4),new Chord(2, 0),new Chord(2, 3),
-        //     new Chord(6, 4),new Chord(11, 4),new Chord(2, 5),new Chord(4, 4),
-        //     new Chord(2, 3),new Chord(2, 3),new Chord(11, 4),new Chord(11, 4),
-        //     new Chord(2, 1),new Chord(2, 4),new Chord(2, 0),new Chord(2, 3),
-        //     new Chord(6, 4),new Chord(11, 4),new Chord(2, 5),new Chord(4, 4),
-        //     new Chord(2, 3),new Chord(2, 3),new Chord(11, 4),new Chord(11, 4),
-        //     new Chord(2, 1),new Chord(2, 4),new Chord(2, 0),new Chord(2, 3),
-        //     new Chord(6, 4),new Chord(11, 4),new Chord(2, 5),new Chord(4, 4),
-        //     new Chord(2, 3),new Chord(2, 3),new Chord(11, 4),new Chord(11, 4),
-        //     new Chord(2, 1),new Chord(2, 4),new Chord(2, 0),new Chord(2, 3),
-        //     new Chord(6, 4),new Chord(11, 4),new Chord(2, 5),new Chord(4, 4),
-        // ]
-        // outsideChordsArr = [2, 3, 8, 9, 11]
-        // let modalInterchangeIndex = 12*1 + 4 + Math.floor(Math.random()*4)
-        // outsideChordsArr.push(modalInterchangeIndex)
-        // modifyRandomChords(chordsArr, modalInterchangeIndex, Changes.ModalInterchange)
-        // modalInterchangeIndex = 12*2 + 4 + Math.floor(Math.random()*4)
-        // outsideChordsArr.push(modalInterchangeIndex)
-        // modifyRandomChords(chordsArr, modalInterchangeIndex, Changes.ModalInterchange)
-        // modalInterchangeIndex = 12*3 + 4 + Math.floor(Math.random()*4)
-        // outsideChordsArr.push(modalInterchangeIndex)
-        // modifyRandomChords(chordsArr, modalInterchangeIndex, Changes.ModalInterchange)
-        // rhythmSections = [4, 4, 4]
+        let form = songs["Spain"];
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < form.length; j++) {
+                chordsArr.push([new Chord(form[j][0].root, form[j][0].degree)]);
+            }
+        }
+        rhythmSections = [4, 4, 4];
     }
     else if (songName == "Autumn") {
-        // chordsArr = [
-        //     new Chord(7, 1),new Chord(7, 4),new Chord(7, 0),new Chord(7, 3),
-        //     new Chord(7, 6),new Chord(4, 4),new Chord(7, 5),new Chord(7, 5),
-        //     new Chord(7, 6),new Chord(4, 4),new Chord(7, 5),new Chord(7, 5),
-        //     new Chord(7, 1),new Chord(7, 4),new Chord(7, 0),new Chord(7, 0),
-        //     new Chord(7, 6),new Chord(4, 4),new Chord(7, 6),new Chord(7, 6),
-        //     new Chord(7, 3),new Chord(4, 4),new Chord(7, 5),new Chord(7, 5),
-        //     new Chord(7, 1),new Chord(7, 4),new Chord(7, 0),new Chord(7, 3),
-        //     new Chord(7, 6),new Chord(4, 4),new Chord(7, 5),new Chord(7, 5),
-        //     new Chord(7, 6),new Chord(4, 4),new Chord(7, 5),new Chord(7, 5),
-        //     new Chord(7, 1),new Chord(7, 4),new Chord(7, 0),new Chord(7, 0),
-        //     new Chord(7, 6),new Chord(4, 4),new Chord(7, 6),new Chord(7, 6),
-        //     new Chord(7, 3),new Chord(4, 4),new Chord(7, 5),new Chord(7, 5)
-        // ]
-        // modifyRandomChords(chordsArr, 20, Changes.TwoFive, [TwoFiveArgs.TritoneTwoFive])
-        // modifyRandomChords(chordsArr, 19, Changes.TwoFive, [TwoFiveArgs.TritoneTwoFive])
-        // rhythmSections = [4, 4, 4, 4, 4, 4]
+        let form = songs["Autumn"];
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < form.length; j++) {
+                chordsArr.push([new Chord(form[j][0].root, form[j][0].degree)]);
+            }
+        }
+        modifyChords(chordsArr, 28, Changes.TwoFive, [TwoFiveArgs.TritoneTwoFive]);
+        modifyChords(chordsArr, 27, Changes.TwoFive, [TwoFiveArgs.TritoneTwoFive]);
+        rhythmSections = [4, 4, 4, 4];
     }
     // console.log(chordsArr)
     return { chordsArr, rhythmSections };
