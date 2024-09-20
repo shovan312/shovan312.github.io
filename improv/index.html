@@ -77,12 +77,128 @@
     .icon-button:hover {
         color: #007BFF; /* Changes icon color on hover */
     }
+
+    /* Container and Flexbox for left-to-right alignment */
+    .changers-container {
+      display: flex;
+      justify-content: space-between; /* Distribute space between items */
+      align-items: center;
+      padding: 20px;
+      margin-bottom: 100px;
+      background-color: #111111; /* Light background for a material feel */
+      border-radius: 8px; /* Rounded corners */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Material-like shadow */
+      gap: 20%; /* Space between items */
+      width: 50%
+    }
+
+    /* Flex item styling */
+    .changers-item {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    /* Material Design inspired label */
+    label {
+      font-size: 30px;
+      font-family: system-ui;
+      color: #757575; /* Subtle color for label */
+      margin-bottom: 15px;
+    }
+
+    /* Material style for select elements */
+    select {
+      font-size: 16px;
+      padding: 3px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      background-color: #fff;
+      color: #333;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.2s ease;
+    }
+
+    select:hover, select:focus {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      outline: none;
+    }
+
+    /* Material style for slider */
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 5px;
+      background: #2196F3; /* Material Blue */
+      outline: none;
+      transition: background 0.2s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #2196F3;
+      cursor: pointer;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      transition: background 0.2s ease;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background-color: #f1f1f1;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #fff;
+      border: 2px solid #2196F3;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
+  <div id="songChangers" class="changers-container">
+    <div class="changers-item">
+      <label for="ddSongName">Song:</label>
+      <select id="ddSongName">
+          <option value="Moon">Fly Me To The Moon</option>
+          <option value="Spain">Spain</option>
+          <option value="Autumn">Autumn Leaves</option>
+          <option value="BlueBossa">Blue Bossa</option>
+          <option value="Random">Random</option>
+      </select>
+    </div>
+    <div class="changers-item">
+      <label for="ddKey">Key:</label>
+      <select id="ddKey">
+          <option value=0>C</option>
+          <option value=1>C#</option>
+          <option value=2>D</option>
+          <option value=3>D#</option>
+          <option value=4>E</option>
+          <option value=5>F</option>
+          <option value=6>F#</option>
+          <option value=7>G</option>
+          <option value=8>G#</option>
+          <option value=9>A</option>
+          <option value=10>A#</option>
+          <option value=11>B</option>
+      </select>
+    </div>
+    <div class="changers-item">
+      <label for="slider">Tempo:</label>
+      <input type="range" id="slider" min="20" max="100" value="50">
+    </div>
+  </div>
+  
   <div id="main-grid">
   </div>
-
   <div class="big-text" id="notes"></div>
   
 </body>
@@ -93,37 +209,7 @@
 <button id="metro-btn" class="icon-button"><i class="fas fa-metro"></i></button>
 </div>
 
-<label for="ddSongName">Choose an option:</label>
-    <select id="ddSongName">
-        <option value="Moon">Moon</option>
-        <option value="Spain">Spain</option>
-        <option value="Autumn">Autumn</option>
-        <option value="Random">Random</option>
-    </select>
 
-    <br><br>
-
-    <label for="ddKey">Choose an option:</label>
-    <select id="ddKey">
-        <option value=0>C</option>
-        <option value=1>C#</option>
-        <option value=2>D</option>
-        <option value=3>D#</option>
-        <option value=4>E</option>
-        <option value=5>F</option>
-        <option value=6>F#</option>
-        <option value=7>G</option>
-        <option value=8>G#</option>
-        <option value=9>A</option>
-        <option value=10>A#</option>
-        <option value=11>B</option>
-    </select>
-
-    <br><br>
-
-    <!-- Slider -->
-    <label for="slider">Adjust the slider:</label>
-    <input type="range" id="slider" min="20" max="100" value="50">
 
 <script type="module" src="/improv/dist/moontone.js"></script>
 </html>

@@ -6,10 +6,12 @@ export class Chord {
     root:number;
     degree:number;
     textNotes:string;
-    constructor(root:number, degree:number) {
+    isDiatonic:boolean;
+    constructor(root:number, degree:number, isDiationic:boolean=true) {
         this.root = root;
         this.degree = degree;
         this.textNotes = "";
+        this.isDiatonic = isDiationic;
     }
 
     public toString() {

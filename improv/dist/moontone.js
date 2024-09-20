@@ -37,7 +37,7 @@ function modifyChords(chordsArray, targetIndex, change, args) {
     if (change == 0) {
         const nextChord = chordsArray[targetIndex + 1][0];
         const nextNote = majorNotes[nextChord.root][nextChord.degree];
-        const subDomChord = new Chord(nextNote, 4);
+        const subDomChord = new Chord(nextNote, 4, false);
         subDomChord.textNotes = "Dominant of " + chromatic_map[nextNote];
         if (args[0] == SubDomArgs.KeepPrevious) {
             chordsArray[targetIndex].push(subDomChord);
@@ -52,13 +52,14 @@ function modifyChords(chordsArray, targetIndex, change, args) {
         const targetMode = args == undefined ? Math.floor(Math.random() * 7) - 1 : args[0];
         const oldRoot = chordsArray[targetIndex][0].root;
         const oldDegree = chordsArray[targetIndex][0].degree;
-        chordsArray[targetIndex][0].root = oldRoot - 7 * targetMode;
+        chordsArray[targetIndex][0].root = positiveMod(oldRoot - 7 * targetMode, 12);
         //can randomize this as well
-        chordsArray[targetIndex][0].degree = oldDegree + 4 * targetMode;
+        chordsArray[targetIndex][0].degree = positiveMod(oldDegree + 4 * targetMode, 7);
+        chordsArray[targetIndex][0].isDiatonic = false;
         // chordsArray[targetIndex][0].degree = oldDegree + 4*targetMode + Math.floor(Math.random()*2)
         //or find chord in newMode with original melody note
-        chordsArray[targetIndex][0].root = positiveMod(chordsArray[targetIndex][0].root, 12);
-        chordsArray[targetIndex][0].degree = positiveMod(chordsArray[targetIndex][0].degree, 7);
+        // chordsArray[targetIndex][0].root = positiveMod(chordsArray[targetIndex][0].root, 12)
+        // chordsArray[targetIndex][0].degree = positiveMod(chordsArray[targetIndex][0].degree, 7)
         const outSideNotes = getOutsideNotes(chordsArray[targetIndex][0], oldRoot);
         let outSideStr = "";
         outSideNotes.forEach(function (x) { outSideStr += chromatic_map[x] + " "; });
@@ -68,16 +69,16 @@ function modifyChords(chordsArray, targetIndex, change, args) {
     else if (change == 2) {
         //Make previous note second of target note
         const currNote = chordsArray[targetIndex][0];
-        chordsArray[targetIndex - 1] = [new Chord(majorNotes[currNote.root][currNote.degree], 1)];
+        chordsArray[targetIndex - 1] = [new Chord(majorNotes[currNote.root][currNote.degree], 1, false)];
         //normal 2-5
         if (args == undefined || args[0] == TwoFiveArgs.TwoFive) {
             //Add a fifth dom as second note in bar
-            chordsArray[targetIndex - 1].push(new Chord(majorNotes[currNote.root][currNote.degree], 4));
+            chordsArray[targetIndex - 1].push(new Chord(majorNotes[currNote.root][currNote.degree], 4, false));
         }
         //tritone sub
         else if (args[0] == TwoFiveArgs.TritoneTwoFive) {
             //Add a minor ninth dom as second note in bar
-            chordsArray[targetIndex - 1].push(new Chord(positiveMod(majorNotes[currNote.root][currNote.degree] - 6, 12), 4));
+            chordsArray[targetIndex - 1].push(new Chord(positiveMod(majorNotes[currNote.root][currNote.degree] - 6, 12), 4, false));
         }
     }
 }
@@ -128,7 +129,12 @@ function animateWrapper() {
             let currScaleDegree = songChords[index][subIndex].degree;
             for (let i = 0; i < gridItems.length; i++) {
                 gridItems[i].style.backgroundColor = "#3498db";
-                // outsideChordsArr.includes(i + songLength*Math.floor(index/songLength)) ? gridItems[i].style.backgroundColor = "#103166" : gridItems[i].style.backgroundColor = "#3498db";
+                let isAnyChordNotDiatonic = false;
+                for (let j = 0; j < songChords[i + songLength * Math.floor(index / songLength)].length; j++) {
+                    if (!songChords[i + songLength * Math.floor(index / songLength)][j].isDiatonic)
+                        isAnyChordNotDiatonic = true;
+                }
+                isAnyChordNotDiatonic ? gridItems[i].style.backgroundColor = "#103166" : gridItems[i].style.backgroundColor = "#3498db";
                 let barString = "";
                 songChords[i + songLength * Math.floor(index / songLength)].forEach((chord) => barString += chord.getChordName());
                 gridItems[i].innerHTML = barString;
@@ -245,7 +251,7 @@ document.getElementById("ddKey").addEventListener("change", () => {
 ////////
 function getSong(songName, key) {
     let chordsArr = [], rhythmSections = [];
-    if (songName == undefined) {
+    if (songName == undefined || songName == "" || songName == "Random") {
         //randomize everything
         let form = getRandomChords();
         modifyChords(form, 15, Changes.Dominant, [SubDomArgs.KeepPrevious]);
@@ -290,6 +296,19 @@ function getSong(songName, key) {
         }
         modifyChords(chordsArr, 28, Changes.TwoFive, [TwoFiveArgs.TritoneTwoFive]);
         modifyChords(chordsArr, 27, Changes.TwoFive, [TwoFiveArgs.TritoneTwoFive]);
+        rhythmSections = [8, 8, 8, 8];
+    }
+    else if (songName == "BlueBossa") {
+        let form = songs["BlueBossa"];
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < form.length; j++) {
+                let currBar = [];
+                for (let k = 0; k < form[j].length; k++) {
+                    currBar.push(new Chord(positiveMod(form[j][k].root + (key - 3), 12), form[j][k].degree));
+                }
+                chordsArr.push(currBar);
+            }
+        }
         rhythmSections = [4, 4, 4, 4];
     }
     // console.log(chordsArr)

@@ -5,10 +5,12 @@ export class Chord {
     root;
     degree;
     textNotes;
-    constructor(root, degree) {
+    isDiatonic;
+    constructor(root, degree, isDiationic = true) {
         this.root = root;
         this.degree = degree;
         this.textNotes = "";
+        this.isDiatonic = isDiationic;
     }
     toString() {
         const currMajorNotes = majorNotes[this.root];
