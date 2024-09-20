@@ -146,7 +146,7 @@ function onClick(event) {
             window.open(url, '_blank');
         }
         else if (intersectedObject.name == "4") {
-            let url = "https://shovan312.github.io/resume.pdf";
+            let url = "https://shovan312.github.io/dist/resume.pdf";
             window.open(url, '_blank');
         }
         // console.log('Clicked on:', intersectedObject);
