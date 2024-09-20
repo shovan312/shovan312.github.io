@@ -5,13 +5,19 @@ import {OrbitControls} from "./three/examples/jsm/controls/OrbitControls.js";
 //@ts-ignore
 import {FontLoader} from "./three/examples/jsm/loaders/FontLoader.js";
 //@ts-ignore
+import {OBJLoader} from "./three/examples/jsm/loaders/OBJLoader.js";
+//@ts-ignore
+import {OBJLoader} from "./three/examples/jsm/loaders/OBJLoader.js";
+// //@ts-ignore
+// import {FBXLoader} from "./three/examples/jsm/loaders/FBXLoader";
+//@ts-ignore
 import {TextGeometry} from "./three/examples/jsm/geometries/TextGeometry.js"
 
 // Scene and Camera Setup
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xeeeeee);
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-camera.position.z = 8;
+camera.position.z = 10;
 
 
 // Renderer
@@ -20,6 +26,7 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
 const orbitControls = new OrbitControls(camera, renderer.domElement)
+const clock = new THREE.Clock()
 
 
 // Light setup for a material design look (soft shadows and lighting)
@@ -38,6 +45,7 @@ scene.add(colorBand);
 const band1Geometry = new THREE.PlaneGeometry(1.5, 1.5);
 const band1Material = new THREE.MeshBasicMaterial({ color: 0x000000, side: THREE.DoubleSide }); // Monochrome color (grey)
 const band1 = new THREE.Mesh(band1Geometry, band1Material);
+band1.name = "1"
 colorBand.add(band1);
 band1.position.x -= 3
 band1.position.z += 0.1
@@ -45,6 +53,7 @@ band1.position.z += 0.1
 const band2Geometry = new THREE.PlaneGeometry(1.5, 1.5);
 const band2Material = new THREE.MeshBasicMaterial({ color: 0x333333, side: THREE.DoubleSide }); // Monochrome color (grey)
 const band2 = new THREE.Mesh(band2Geometry, band2Material);
+band2.name = "2"
 band1.add(band2);
 band2.position.x = 3/2
 
@@ -52,6 +61,7 @@ band2.position.x = 3/2
 const band3Geometry = new THREE.PlaneGeometry(1.5, 1.5);
 const band3Material = new THREE.MeshBasicMaterial({ color: 0x666666, side: THREE.DoubleSide }); // Monochrome color (grey)
 const band3 = new THREE.Mesh(band3Geometry, band3Material);
+band3.name = "3"
 band2.add(band3);
 band3.position.x = 3/2
 
@@ -60,6 +70,7 @@ band3.position.x = 3/2
 const band4Geometry = new THREE.PlaneGeometry(1.5, 1.5);
 const band4Material = new THREE.MeshBasicMaterial({ color: 0x999999, side: THREE.DoubleSide }); // Monochrome color (grey)
 const band4 = new THREE.Mesh(band4Geometry, band4Material);
+band4.name = "4"
 band3.add(band4);
 band4.position.x = 3/2
 
@@ -83,10 +94,31 @@ loader.load('./dist/fonts/helvetiker_bold.typeface.json', function (response:any
     scene.add(textMesh1);
 });
 
-
+const objLoader:OBJLoader = new OBJLoader();
+function loadObj( path:string):Promise<THREE.Group>{
+    return new Promise(function(resolve, reject){
+        var progress=undefined;
+        objLoader.load(path, resolve, progress, reject);
+    });
+}
+let handObj = await loadObj('./dist/obj/72-rigged_hand_obj/base.obj');
+const objMesh = handObj.children[0];
+const mat = new THREE.MeshStandardMaterial({ side: THREE.DoubleSide, wireframe: true });
+objMesh.material = mat;
+objMesh.geometry.center();
+objMesh.geometry.scale(7, 7, 7);
+objMesh.geometry.rotateZ(-Math.PI / 2);
+objMesh.geometry.rotateX(-Math.PI/2);
+objMesh.geometry.rotateY(Math.PI/2);
+objMesh.geometry.translate(0, -4, 0);
+scene.add(objMesh);
 // Animation Loop
 function animate() {
+    let time = clock.getElapsedTime();
     requestAnimationFrame(animate);
+    objMesh.geometry.rotateY(0.001);
+    objMesh.position.y += 0.001 * Math.sin(time);
+    scene.rotateY(-0.0002 * Math.cos(time * 0.7));
     // Render the scene
     renderer.render(scene, camera);
 }
@@ -115,8 +147,8 @@ function onMouseMove(event:any) {
     const intersects = raycaster.intersectObjects(scene.children);
     if (intersects.length > 0) {
       const intersectedObject = intersects[0].object;
-      intersectedObject.position.z += 0.1
-      console.log(intersectedObject)
+    //   intersectedObject.position.z += 0.1
+    //   console.log(intersectedObject)
     }
 }
 
@@ -127,12 +159,22 @@ function onClick(event:any) {
     const intersects = raycaster.intersectObjects(scene.children);
     if (intersects.length > 0) {
         const intersectedObject = intersects[0].object;
-        console.log('Clicked on:', intersectedObject);
+        if (intersectedObject.name == "1") {
+            let url = "https://local-sovereign-ce6.notion.site/d73a6fa722c84898b7bd2895d2bdb0fe?v=c12a545174934043a7e78f64f17caeab&pvs=74"
+            window.open(url, '_blank');
+        }
+        else if (intersectedObject.name == "2") {
+            let url = "https://shovan312.github.io/improv"
+            window.open(url, '_blank');
+        }
+        else if (intersectedObject.name == "3") {
+            let url = "https://www.instagram.com/binary_brushwork/"
+            window.open(url, '_blank');
+        }
+        else if (intersectedObject.name == "4") {
+            let url = "https://shovan312.github.io/resume.pdf"
+            window.open(url, '_blank');
+        }
+        // console.log('Clicked on:', intersectedObject);
     }
 }
-
-
-/*
-import * as THREE from '../node_modules/three/build/three.module.js'
-import {OrbitControls} from "../node_modules/three/examples/jsm/controls/OrbitControls.js";
-*/
