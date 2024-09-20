@@ -12,6 +12,11 @@ import {OBJLoader} from "./three/examples/jsm/loaders/OBJLoader.js";
 // import {FBXLoader} from "./three/examples/jsm/loaders/FBXLoader";
 //@ts-ignore
 import {TextGeometry} from "./three/examples/jsm/geometries/TextGeometry.js"
+import { getBallPoints, getCube, getGeometryPoints, getPointMeshArr } from './points.js';
+//@ts-ignore
+import { MathUtils } from './three/build/three.module.js';
+import { morph, rearrangeArr, byR, byY, byRandom } from './transformations.js';
+
 
 // Scene and Camera Setup
 const scene = new THREE.Scene();
@@ -40,6 +45,7 @@ scene.add(pointLight);
 const bandGeometry = new THREE.PlaneGeometry(7.5, 1.5);
 const bandMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide }); // Monochrome color (grey)
 const colorBand = new THREE.Mesh(bandGeometry, bandMaterial);
+colorBand.position.y += 2
 scene.add(colorBand);
 
 const band1Geometry = new THREE.PlaneGeometry(1.5, 1.5);
@@ -48,7 +54,7 @@ const band1 = new THREE.Mesh(band1Geometry, band1Material);
 band1.name = "1"
 colorBand.add(band1);
 band1.position.x -= 3
-band1.position.z += 0.1
+band1.position.z += 0.01
 
 const band2Geometry = new THREE.PlaneGeometry(1.5, 1.5);
 const band2Material = new THREE.MeshBasicMaterial({ color: 0x333333, side: THREE.DoubleSide }); // Monochrome color (grey)
@@ -76,6 +82,7 @@ band4.position.x = 3/2
 
 ///////
 const loader = new FontLoader();
+let textMesh1 = new THREE.Mesh();
 loader.load('./dist/fonts/helvetiker_bold.typeface.json', function (response:any) {
     let font = response;
     let textGeo = new TextGeometry("Welcome!", {
@@ -88,8 +95,8 @@ loader.load('./dist/fonts/helvetiker_bold.typeface.json', function (response:any
         bevelEnabled: true
     });
     textGeo.scale(0.01,0.01,0.01)
-    let textMesh1 = new THREE.Mesh(textGeo, new THREE.MeshBasicMaterial({ color: 0x999999, side: THREE.DoubleSide }));
-    textMesh1.position.y += 2
+    textMesh1 = new THREE.Mesh(textGeo, new THREE.MeshBasicMaterial({ color: 0x999999, side: THREE.DoubleSide }));
+    textMesh1.position.y += 4
     textMesh1.position.x -= 5.9
     scene.add(textMesh1);
 });
@@ -112,18 +119,25 @@ objMesh.geometry.rotateX(-Math.PI/2);
 objMesh.geometry.rotateY(Math.PI/2);
 objMesh.geometry.translate(0, -4, 0);
 scene.add(objMesh);
-// Animation Loop
-function animate() {
-    let time = clock.getElapsedTime();
-    requestAnimationFrame(animate);
-    objMesh.geometry.rotateY(0.001);
-    objMesh.position.y += 0.001 * Math.sin(time);
-    scene.rotateY(-0.0002 * Math.cos(time * 0.7));
-    // Render the scene
-    renderer.render(scene, camera);
-}
 
-animate();
+let catObj = await loadObj('./dist/obj/72-rigged_hand_obj/Cat.obj');
+const catMesh = catObj.children[0] as THREE.Mesh;
+catMesh.geometry.center();
+catMesh.geometry.rotateX(-Math.PI/2)
+catMesh.geometry.rotateY(Math.PI/2)
+catMesh.geometry.translate(-5, -10, 0)
+catMesh.geometry.scale(0.1,0.1,0.1)
+
+const cubePoints = getCube(20, new THREE.Vector3(0, 0, -20 / 2), new THREE.Vector3(3, 3, 3));
+cubePoints.posArray = rearrangeArr(cubePoints.posArray, byR)
+const ballPoints = getBallPoints(20, 1);
+ballPoints.posArray = rearrangeArr(ballPoints.posArray, byR)
+
+const catPoints = getGeometryPoints(catMesh.geometry);
+catPoints.posArray = rearrangeArr(catPoints.posArray, byR)
+
+const pointsMesh = getPointMeshArr(cubePoints.posArray, 0.01);
+scene.add(pointsMesh);
 
 // Handle Window Resizing
 window.addEventListener('resize', () => {
@@ -175,6 +189,66 @@ function onClick(event:any) {
             let url = "https://shovan312.github.io/resume.pdf"
             window.open(url, '_blank');
         }
-        // console.log('Clicked on:', intersectedObject);
+        console.log('Clicked on:', intersectedObject);
     }
 }
+
+let spacePressed:boolean = false;
+let isUserAnimDone:boolean = true;
+let animStartedAt:number = 0;
+let animIndex:number = 0;
+document.addEventListener('keydown', (e) => keyPressed(e));
+function keyPressed(e:KeyboardEvent) {
+    if(e.code === "Space") {
+        if(isUserAnimDone) {
+            spacePressed = true
+            animStartedAt = Date.now();
+            isUserAnimDone = false;
+        }
+    }
+}
+
+
+// Animation Loop
+function animate() {
+    let time = clock.getElapsedTime();
+    requestAnimationFrame(animate);
+    if (time < 10) {
+        camera.position.z = MathUtils.clamp(3 + time, 3, 10);
+    }
+    pointsMesh.material.size = 0.02 + 0.005 * Math.sin(time);
+    objMesh.geometry.rotateY(0.001);
+    objMesh.position.y += 0.001 * Math.sin(time);
+    scene.rotateY(-0.0002 * Math.cos(time * 0.7));
+    if (spacePressed) {
+        let morphParam = (Date.now() - animStartedAt) / 10000;
+
+        if (animIndex == 0) {
+            const cube2ball = morph(cubePoints.posArray, ballPoints.posArray, morphParam);
+            pointsMesh.geometry.setAttribute('position', new THREE.Float32BufferAttribute(cube2ball, 3));
+        }
+        else if (animIndex == 1) {
+            const ball2hand = morph(ballPoints.posArray, catPoints.posArray, morphParam);
+            pointsMesh.geometry.setAttribute('position', new THREE.Float32BufferAttribute(ball2hand, 3));
+        }
+        
+        if (1 - morphParam < 0.01) {
+            isUserAnimDone = true;
+            spacePressed = false
+            animIndex += 1;
+        }
+    }
+    if (isUserAnimDone) {
+        textMesh1.visible = true
+        colorBand.visible = true
+    }
+    else {
+        textMesh1.visible = false
+        colorBand.visible = false
+    }
+
+    // Render the scene
+    renderer.render(scene, camera);
+}
+
+animate();
