@@ -32,5 +32,26 @@ export const songs:{[key:string]:Chord[][]} = {
         [new Chord(3, 6)], [new Chord(0, 4)], [new Chord(3, 5)], [new Chord(3, 5)],
         [new Chord(1, 1)], [new Chord(1, 4)], [new Chord(1, 0)], [new Chord(1, 0)],
         [new Chord(3, 6)], [new Chord(0, 4)], [new Chord(3, 5)], [new Chord(3, 6), new Chord(0, 4)],
+    ],
+    "Foolish" : [
+        [new Chord(10, 0)], [new Chord(10, 3)], [new Chord(10, 2)], [new Chord(0, 4)], 
+        [new Chord(10, 1)], [new Chord(10, 1)], [new Chord(2, 1)], [new Chord(2, 4)],
+        [new Chord(10, 2)], [new Chord(7, 4)], [new Chord(10, 5)], [new Chord(10, 5)],
+        [new Chord(10, 1)], [new Chord(10, 1)], [new Chord(1, 6)], [new Chord(10, 4)],
+        
+        [new Chord(10, 0)], [new Chord(10, 0)], [new Chord(3, 1)], [new Chord(3, 4)],
+        [new Chord(3, 0)], [new Chord(3, 0)], [new Chord(10, 6)], [new Chord(7, 4)],
+        [new Chord(10, 5)], [new Chord(7, 4)], [new Chord(10, 5)], [new Chord(5, 4)],
+        [new Chord(3, 5)], [new Chord(0, 4)], [new Chord(3, 5)], [new Chord(10, 4)],
+
+        [new Chord(10, 0)], [new Chord(10, 3)], [new Chord(10, 2)], [new Chord(0, 4)], 
+        [new Chord(10, 1)], [new Chord(10, 1)], [new Chord(2, 1)], [new Chord(2, 4)],
+        [new Chord(10, 2)], [new Chord(7, 4)], [new Chord(10, 5)], [new Chord(10, 5)],
+        [new Chord(10, 1)], [new Chord(10, 1)], [new Chord(10, 6)], [new Chord(7, 4)],
+
+        [new Chord(10, 5)], [new Chord(10, 5)], [new Chord(10, 3)], [new Chord(1, 4)],
+        [new Chord(10, 0)], [new Chord(10, 3)], [new Chord(3, 6)], [new Chord(0, 4)],
+        [new Chord(10, 1)], [new Chord(0, 4)], [new Chord(5, 4)], [new Chord(10, 4)],
+        [new Chord(10, 0)], [new Chord(10, 5)], [new Chord(10, 1)], [new Chord(10, 4)]
     ]
 };

@@ -174,7 +174,7 @@ function runAnim() {
 
 function createMelody(songChords){
     let melody = [];
-    for (let i = 0; i < 16; i++) {
+    for (let i = 0; i < songChords.length; i++) {
         let currBar = songChords[i];
         if (currBar.length == 1) {
             let currChord = songChords[i][0];
@@ -349,6 +349,19 @@ function getSong(songName:string, key:number) {
                 let currBar = []
                 for(let k=0; k<form[j].length; k++) {
                     currBar.push(new Chord(positiveMod(form[j][k].root + (key - 3), 12), form[j][k].degree));
+                }
+                chordsArr.push(currBar)
+            }
+        }
+        rhythmSections = [4, 4, 4, 4]
+    }
+    else if (songName == "Foolish") {
+        let form = songs["Foolish"]
+        for (let i = 0; i < 4; i++) {
+            for (let j = 0; j < form.length; j++) {
+                let currBar = []
+                for(let k=0; k<form[j].length; k++) {
+                    currBar.push(new Chord(positiveMod(form[j][k].root + (key + 2), 12), form[j][k].degree));
                 }
                 chordsArr.push(currBar)
             }
