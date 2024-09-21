@@ -43,7 +43,7 @@ const band1 = new THREE.Mesh(band1Geometry, band1Material);
 band1.name = "1";
 colorBand.add(band1);
 band1.position.x -= 3;
-band1.position.z += 0.1;
+band1.position.z += 0.01;
 const band2Geometry = new THREE.PlaneGeometry(1.5, 1.5);
 const band2Material = new THREE.MeshBasicMaterial({ color: 0x333333, side: THREE.DoubleSide }); // Monochrome color (grey)
 const band2 = new THREE.Mesh(band2Geometry, band2Material);
@@ -62,6 +62,12 @@ const band4 = new THREE.Mesh(band4Geometry, band4Material);
 band4.name = "4";
 band3.add(band4);
 band4.position.x = 3 / 2;
+const band5Geometry = new THREE.PlaneGeometry(1.5, 1.5);
+const band5Material = new THREE.MeshBasicMaterial({ color: 0xbbbbbb, side: THREE.DoubleSide }); // Monochrome color (grey)
+const band5 = new THREE.Mesh(band5Geometry, band5Material);
+band5.name = "5";
+band4.add(band5);
+band5.position.x = 3 / 2;
 ///////
 const loader = new FontLoader();
 let textMesh1 = new THREE.Mesh();
@@ -107,7 +113,7 @@ catMesh.geometry.rotateX(-Math.PI / 2);
 catMesh.geometry.rotateY(Math.PI / 2);
 catMesh.geometry.translate(-5, -10, 0);
 catMesh.geometry.scale(0.1, 0.1, 0.1);
-const cubePoints = getCube(20, new THREE.Vector3(0, 0, -20 / 2), new THREE.Vector3(3, 3, 3));
+const cubePoints = getCube(20, new THREE.Vector3(0, 0, (-20 / 2) * 3), new THREE.Vector3(3, 3, 3));
 cubePoints.posArray = rearrangeArr(cubePoints.posArray, byR);
 const ballPoints = getBallPoints(20, 1);
 ballPoints.posArray = rearrangeArr(ballPoints.posArray, byR);
@@ -156,7 +162,11 @@ function onClick(event) {
             window.open(url, '_blank');
         }
         else if (intersectedObject.name == "4") {
-            let url = "https://shovan312.github.io/resume.pdf";
+            let url = "https://shovan312.github.io/dist/resume.pdf";
+            window.open(url, '_blank');
+        }
+        else if (intersectedObject.name == "5") {
+            let url = "https://shovan312.github.io/gallery";
             window.open(url, '_blank');
         }
         console.log('Clicked on:', intersectedObject);

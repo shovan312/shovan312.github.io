@@ -132,7 +132,7 @@ catMesh.geometry.rotateY(Math.PI/2)
 catMesh.geometry.translate(-5, -10, 0)
 catMesh.geometry.scale(0.1,0.1,0.1)
 
-const cubePoints = getCube(20, new THREE.Vector3(0, 0, -20 / 2), new THREE.Vector3(3, 3, 3));
+const cubePoints = getCube(20, new THREE.Vector3(0, 0, (-20 / 2)*3), new THREE.Vector3(3, 3, 3));
 cubePoints.posArray = rearrangeArr(cubePoints.posArray, byR)
 const ballPoints = getBallPoints(20, 1);
 ballPoints.posArray = rearrangeArr(ballPoints.posArray, byR)
@@ -190,7 +190,7 @@ function onClick(event:any) {
             window.open(url, '_blank');
         }
         else if (intersectedObject.name == "4") {
-            let url = "https://shovan312.github.io/resume.pdf"
+            let url = "https://shovan312.github.io/dist/resume.pdf"
             window.open(url, '_blank');
         }
         else if (intersectedObject.name == "5") {
