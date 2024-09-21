@@ -19,6 +19,8 @@ body, html {
 }
 #projects a {
 	overflow: hidden;
+    position: relative; /* Position relative for text placement */
+    cursor: pointer; 
 }
 #projects a img {
 	width: 100%;
@@ -28,6 +30,26 @@ body, html {
 }
 #projects a:hover img {
 	transform: scale(1.08);
+    filter: brightness(50%) blur(2px); /* Darkens and blurs the image on hover */
+}
+
+#projects a .overlay-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    opacity: 0; /* Hidden by default */
+    transition: opacity 0.3s ease; /* Fade-in effect */
+    text-align: center;
+    white-space: nowrap;
+    max-width: 80%; /* Set a max width for the overlay text */
+}
+
+#projects a:hover .overlay-text {
+    opacity: 1; /* Text becomes visible on hover */
 }
 
 .video-overlay {
