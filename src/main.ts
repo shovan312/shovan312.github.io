@@ -63,7 +63,6 @@ band2.name = "2"
 band1.add(band2);
 band2.position.x = 3/2
 
-
 const band3Geometry = new THREE.PlaneGeometry(1.5, 1.5);
 const band3Material = new THREE.MeshBasicMaterial({ color: 0x666666, side: THREE.DoubleSide }); // Monochrome color (grey)
 const band3 = new THREE.Mesh(band3Geometry, band3Material);
@@ -71,14 +70,19 @@ band3.name = "3"
 band2.add(band3);
 band3.position.x = 3/2
 
-
-
 const band4Geometry = new THREE.PlaneGeometry(1.5, 1.5);
 const band4Material = new THREE.MeshBasicMaterial({ color: 0x999999, side: THREE.DoubleSide }); // Monochrome color (grey)
 const band4 = new THREE.Mesh(band4Geometry, band4Material);
 band4.name = "4"
 band3.add(band4);
 band4.position.x = 3/2
+
+const band5Geometry = new THREE.PlaneGeometry(1.5, 1.5);
+const band5Material = new THREE.MeshBasicMaterial({ color: 0xbbbbbb, side: THREE.DoubleSide }); // Monochrome color (grey)
+const band5 = new THREE.Mesh(band5Geometry, band5Material);
+band5.name = "5"
+band4.add(band5);
+band5.position.x = 3/2
 
 ///////
 const loader = new FontLoader();
@@ -187,6 +191,10 @@ function onClick(event:any) {
         }
         else if (intersectedObject.name == "4") {
             let url = "https://shovan312.github.io/resume.pdf"
+            window.open(url, '_blank');
+        }
+        else if (intersectedObject.name == "5") {
+            let url = "https://shovan312.github.io/gallery"
             window.open(url, '_blank');
         }
         console.log('Clicked on:', intersectedObject);
