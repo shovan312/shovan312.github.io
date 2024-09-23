@@ -26,7 +26,7 @@ body, html {
 	width: 100%;
 	transform: scale(1.0);
 	transition: 0.15s transform;
-    padding: 23px;
+    padding: 5px;
 }
 #projects a:hover img {
 	transform: scale(1.08);
