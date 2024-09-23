@@ -1,9 +1,9 @@
-import { chromatic_map, majorScale, modeMapFifths, Changes, TwoFiveArgs, SubDomArgs, } from './config.js';
+import { chromatic_map, chromatic_map_reverse, majorScale, modeMapFifths, Changes, TwoFiveArgs, SubDomArgs, } from './config.js';
 import { Chord } from './chord.js';
 import { majorChords, majorNotes, makeChords, positiveMod } from './common.js';
 //@ts-ignore
 import Tone from './Tone.js';
-import { songs } from './songs.js';
+import { songKeys, songs } from './songs.js';
 import { synth } from './sounds.js';
 /////////////
 function getRandomChords() {
@@ -232,7 +232,9 @@ document.getElementById("ddSongName").addEventListener("change", () => {
     const selectedValue = dropdown.value;
     stopPlayback();
     songName = selectedValue;
-    initSong(tempo, songName, key);
+    const newKey = parseInt(chromatic_map_reverse[songKeys[songName]]);
+    initSong(tempo, songName, newKey);
+    document.getElementById("ddKey").value = "" + newKey + "";
 });
 document.getElementById("slider").addEventListener("mouseup", () => {
     const slider = document.getElementById("slider");
@@ -240,6 +242,12 @@ document.getElementById("slider").addEventListener("mouseup", () => {
     stopPlayback();
     tempo = parseInt(sliderValue, 10);
     initSong(tempo, songName, key);
+});
+document.getElementById("volSlider").addEventListener("mouseup", () => {
+    const slider = document.getElementById("volSlider");
+    const sliderValue = parseInt(slider.value);
+    // const volMultiplier = Math.log(sliderValue)/Math.log(12)
+    Tone.Destination.volume.value = sliderValue;
 });
 document.getElementById("ddKey").addEventListener("change", () => {
     const dropdown = document.getElementById("ddKey");

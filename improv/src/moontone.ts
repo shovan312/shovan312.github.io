@@ -4,7 +4,7 @@ import {Chord} from './chord.js'
 import { majorChords, majorNotes, makeChords, positiveMod } from './common.js'
 //@ts-ignore
 import Tone from './Tone.js'
-import { songs } from './songs.js';
+import { songKeys, songs } from './songs.js';
 import { synth } from './sounds.js';
 
 /////////////
@@ -266,7 +266,10 @@ document.getElementById("ddSongName").addEventListener("change", () => {
     
     stopPlayback()
     songName = selectedValue
-    initSong(tempo, songName, key)
+    const newKey = parseInt(chromatic_map_reverse[songKeys[songName]]);
+    initSong(tempo, songName, newKey);
+
+    (document.getElementById("ddKey") as HTMLOptionElement).value = "" + newKey;
 })
 
 
@@ -276,7 +279,14 @@ document.getElementById("slider").addEventListener("mouseup", () => {
     
     stopPlayback()
     tempo = parseInt(sliderValue, 10)
-    initSong(tempo, songName, key)
+    initSong(tempo, songName, key);
+})
+
+document.getElementById("volSlider").addEventListener("mouseup", () => {
+    const slider = document.getElementById("volSlider") as HTMLOptionElement;
+    const sliderValue = parseInt(slider.value);
+    // const volMultiplier = Math.log(sliderValue)/Math.log(12)
+    Tone.Destination.volume.value = sliderValue; 
 })
 
 document.getElementById("ddKey").addEventListener("change", () => {

@@ -52,3 +52,10 @@ export const songs = {
         [new Chord(10, 0)], [new Chord(10, 5)], [new Chord(10, 1)], [new Chord(10, 4)]
     ]
 };
+export const songKeys = {
+    "Moon": "C",
+    "Autumn": "Bb",
+    "Spain": "D",
+    "BlueBossa": "Eb",
+    "Foolish": "Bb"
+};

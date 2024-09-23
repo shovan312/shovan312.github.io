@@ -17,6 +17,12 @@ export const chromatic_map:{[key:number]:string} = {
     11: "B"
 };
 export const chromatic_map_reverse = flip(chromatic_map);
+chromatic_map_reverse["Db"] = "1"
+chromatic_map_reverse["Eb"] = "3"
+chromatic_map_reverse["Gb"] = "6"
+chromatic_map_reverse["Ab"] = "8"
+chromatic_map_reverse["Bb"] = "10"
+
 export const fifths_map:{[key:number]:string} = {};
 for (let i = 0; i < 12; i++) {
     fifths_map[i] = chromatic_map[7 * i % 12];
