@@ -17,12 +17,7 @@ import { getBallPoints, getCube, getGeometryPoints, getPointMeshArr } from './po
 import { MathUtils } from './three/build/three.module.js';
 import { morph, rearrangeArr, byR, byY, byRandom, wave } from './transformations.js';
 
-let container, camera:THREE.Camera, renderer:THREE.WebGLRenderer, controls:THREE.OrbitControls;
-let sceneL, sceneR;
-
-// let sliderPos = window.innerWidth / 2;
-let sliderPos = 0;
-
+let container, camera:THREE.Camera, renderer:THREE.WebGLRenderer, controls:THREE.OrbitControls, sliderPos = 0;
 container = document.querySelector('.container');
 // Scene and Camera Setup
 const scene = new THREE.Scene();
@@ -53,6 +48,15 @@ renderer.setScissorTest(true);
 document.body.appendChild(renderer.domElement);
 
 const clock = new THREE.Clock()
+
+const manager = new THREE.LoadingManager();
+manager.onProgress = function () {
+	(document.getElementsByClassName('dialog-content')[0] as HTMLElement).innerHTML = "Loading..."
+};
+
+manager.onLoad = function ( ) {
+	(document.getElementsByClassName('dialog-content')[0] as HTMLElement).innerHTML = "Press space";
+};
 
 // Rectangular Monochrome Color Band
 const bandGeometry = new THREE.PlaneGeometry(7.5, 1.5);
@@ -98,7 +102,7 @@ band4.add(band5);
 band5.position.x = 3/2
 
 ///////
-const loader = new FontLoader();
+const loader = new FontLoader(manager);
 let textMesh1 = new THREE.Mesh();
 let textMesh2 = new THREE.Mesh();
 loader.load('./dist/fonts/droid/droid_sans_bold.typeface.json', function (response:any) {
@@ -122,7 +126,7 @@ loader.load('./dist/fonts/droid/droid_sans_bold.typeface.json', function (respon
     textMesh2.position.x -= 5.9;
     scene2.add(textMesh2);
 });
-const objLoader:OBJLoader = new OBJLoader();
+const objLoader:OBJLoader = new OBJLoader(manager);
 function loadObj( path:string):Promise<THREE.Group>{
     return new Promise(function(resolve, reject){
         var progress=undefined;

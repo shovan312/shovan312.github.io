@@ -14,10 +14,7 @@ import { getBallPoints, getCube, getGeometryPoints, getPointMeshArr } from './po
 //@ts-ignore
 import { MathUtils } from './three/build/three.module.js';
 import { morph, rearrangeArr, byR } from './transformations.js';
-let container, camera, renderer, controls;
-let sceneL, sceneR;
-// let sliderPos = window.innerWidth / 2;
-let sliderPos = 0;
+let container, camera, renderer, controls, sliderPos = 0;
 container = document.querySelector('.container');
 // Scene and Camera Setup
 const scene = new THREE.Scene();
@@ -41,6 +38,14 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setScissorTest(true);
 document.body.appendChild(renderer.domElement);
 const clock = new THREE.Clock();
+const manager = new THREE.LoadingManager();
+manager.onProgress = function () {
+    document.getElementsByClassName('dialog-content')[0].innerHTML = "Loading...";
+};
+manager.onLoad = function () {
+    document.getElementsByClassName('dialog-content')[0].innerHTML = "Press space";
+    // (document.getElementsByClassName('dialog-content')[0] as HTMLElement).style.display = "block"
+};
 // Rectangular Monochrome Color Band
 const bandGeometry = new THREE.PlaneGeometry(7.5, 1.5);
 const bandMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide }); // Monochrome color (grey)
@@ -79,7 +84,7 @@ band5.name = "5";
 band4.add(band5);
 band5.position.x = 3 / 2;
 ///////
-const loader = new FontLoader();
+const loader = new FontLoader(manager);
 let textMesh1 = new THREE.Mesh();
 let textMesh2 = new THREE.Mesh();
 loader.load('./dist/fonts/droid/droid_sans_bold.typeface.json', function (response) {
@@ -103,7 +108,7 @@ loader.load('./dist/fonts/droid/droid_sans_bold.typeface.json', function (respon
     textMesh2.position.x -= 5.9;
     scene2.add(textMesh2);
 });
-const objLoader = new OBJLoader();
+const objLoader = new OBJLoader(manager);
 function loadObj(path) {
     return new Promise(function (resolve, reject) {
         var progress = undefined;
