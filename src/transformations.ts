@@ -29,12 +29,12 @@ function displace(vec:THREE.Vector3, A:number, k:number, w:number, time:number):
 
     //Composite waves
     // vec.x += 0.1*vec.x*A*Math.sin(k*vec.z + k*vec.y + w*time)
-    vec.y += Math.sin((vec.x+time) * 0.5 ) + Math.sin((vec.y+time)*0.7)
+    // vec.y += Math.sin((vec.x+time) * 0.5 ) + Math.sin((vec.y+time)*0.7)
 
     //3D Radial waves
-    // let r = vec.length()
-    // let disp = A*Math.sin(r - w*time);
-    // vec.multiplyScalar(k + disp)
+    let r = vec.length()
+    let disp = A*Math.sin(r - w*time);
+    vec.multiplyScalar(k + disp)
 
     //2D Radial waves
     // let r = Math.sqrt(vec.x*vec.x + vec.y*vec.y)
@@ -73,7 +73,7 @@ export function burn(arr:number[], time:number):number[] {
 export function morph(from:number[], to:number[], time:number): number[] {
     const maxLength = Math.max(from.length, to.length);
     // const t = THREE.MathUtils.clamp(Math.sin(time), 0, 1);
-    const t = time - Math.floor(time);
+    const t = time
     const ret = [];
 
     for(let i=0; i<maxLength; i+=3) {

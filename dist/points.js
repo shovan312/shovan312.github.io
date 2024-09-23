@@ -22,7 +22,7 @@ export function getCube(n, origin = new THREE.Vector3(0, 0, 0), scale = new THRE
                 posArray.push(indexOffset.y + scale.y * (j - (n - 1) / 2) + origin.y);
                 posArray.push(indexOffset.z + scale.z * (k - (n - 1) / 2) + origin.z);
                 // color.setRGB(i/n,j/n,k/n,THREE.SRGBColorSpace)
-                color.setRGB(1, 0, 0, THREE.SRGBColorSpace);
+                color.setRGB(0, 1, 0, THREE.SRGBColorSpace);
                 colors.push(color.r, color.g, color.b);
             }
         }

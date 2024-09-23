@@ -22,11 +22,85 @@
                 color: white;
                 pointer-events: none;
             }
+
+            .container {
+				position: absolute;
+				width: 100%;
+				height: 100%;
+			}
+
+			.slider {
+				position: absolute;
+				cursor: ew-resize;
+
+				width: 40px;
+				height: 40px;
+				background-color: #6c7085;
+				opacity: 0.7;
+				border-radius: 50%;
+
+				top: calc(50% - 20px);
+				left: calc(0% - 20px);
+
+                display: flex;
+                justify-content: center;
+                align-items: center;
+			}
+            .slider::before {
+                content: '';
+                display: inline-block;
+                width: 0; 
+                height: 0; 
+                border-top: 8px solid transparent;
+                border-bottom: 8px solid transparent;
+                border-left: 12px solid white;
+                transform: translateX(2px);
+            }
+            .dialog {
+                width: 300px;
+                background-color: white;
+                border-radius: 8px;
+                box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                /* margin-bottom: 20px; */
+				position: absolute;
+				opacity: 0.7;
+				top: calc(80% - 20px);
+				left: calc(50% - 20px);
+
+                text-align: center;
+			}
+            .dialog-content {
+                position: absolute;
+                font-size: 44px;
+                opacity: 0.7;
+                top: calc(50% - 20px);
+                left: calc(50%);
+                transform: translateX(-50%);
+                font-family: 'Courier New', Courier, monospace;
+                color: #666;
+                margin-bottom: 20px;
+            }
+            #tooltip {
+                font-family: monospace;
+                position: absolute;
+                background-color: rgba(0, 0, 0, 0.4);
+                color: white;
+                padding: 15px;
+                border-radius: 3px;
+                display: none;
+                pointer-events: none; /* Prevents tooltip from interfering with mouse events */
+            }
         </style>
     </head>
 
     <body>
         <!-- <div id="debug1"></div> -->
+         <div class="container">
+            <div class="slider"></div>
+            <div class="dialog-content">Press Space!</div>
+         </div>
+         <div id="tooltip"></div>
         <script type="module" src="./dist/main.js"></script>
     </body>
 </html>
