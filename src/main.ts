@@ -257,7 +257,7 @@ function onClick(event:any) {
     if (intersects.length > 0) {
         const intersectedObject = intersects[0].object;
         if (intersectedObject.name == "1") {
-            let url = "https://disposition.notion.site/d73a6fa722c84898b7bd2895d2bdb0fe?v=c12a545174934043a7e78f64f17caeab"
+            let url = "https://shovan312.github.io/blog"
             window.open(url, '_blank');
         }
         else if (intersectedObject.name == "2") {

@@ -222,7 +222,7 @@ function onClick(event) {
     if (intersects.length > 0) {
         const intersectedObject = intersects[0].object;
         if (intersectedObject.name == "1") {
-            let url = "https://disposition.notion.site/d73a6fa722c84898b7bd2895d2bdb0fe?v=c12a545174934043a7e78f64f17caeab";
+            let url = "https://shovan312.github.io/blog";
             window.open(url, '_blank');
         }
         else if (intersectedObject.name == "2") {
@@ -332,11 +332,12 @@ function initSlider() {
     slider.addEventListener('pointerdown', onPointerDown);
 }
 let lastTouchTime = 0;
-const doubleTouchThreshold = 300; // Time in milliseconds
+const doubleTouchThresholdMax = 300; // Time in milliseconds
+const doubleTouchThresholdMin = 50; // Time in milliseconds
 window.addEventListener('touchstart', function (event) {
     const currentTime = new Date().getTime();
     // Check if the time between the last touch and this one is within the threshold
-    if (currentTime - lastTouchTime < doubleTouchThreshold) {
+    if (currentTime - lastTouchTime < doubleTouchThresholdMax && currentTime - lastTouchTime > doubleTouchThresholdMin) {
         if (isUserAnimDone) {
             document.getElementsByClassName('dialog-content')[0].style.display = "none";
             spacePressed = true;
