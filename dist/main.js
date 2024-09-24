@@ -38,13 +38,16 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.setScissorTest(true);
 document.body.appendChild(renderer.domElement);
 const clock = new THREE.Clock();
+function isMobile() {
+    return /Mobi|Android|iPhone/i.test(navigator.userAgent);
+}
 const manager = new THREE.LoadingManager();
 manager.onProgress = function () {
     document.getElementsByClassName('dialog-content')[0].innerHTML = "Loading...";
 };
 manager.onLoad = function () {
-    document.getElementsByClassName('dialog-content')[0].innerHTML = "Press space";
-    // (document.getElementsByClassName('dialog-content')[0] as HTMLElement).style.display = "block"
+    const dialogText = isMobile() ? "Double tap" : "Press space";
+    document.getElementsByClassName('dialog-content')[0].innerHTML = dialogText;
 };
 // Rectangular Monochrome Color Band
 const bandGeometry = new THREE.PlaneGeometry(7.5, 1.5);
@@ -186,20 +189,24 @@ function onMouseMove(event) {
     }
     if (intersects.length > 0) {
         const intersectedObject = intersects[0].object;
-        tooltip.style.display = 'block';
         if (intersectedObject.name == "1") {
+            tooltip.style.display = 'block';
             tooltip.innerText = "Blog";
         }
         else if (intersectedObject.name == "2") {
+            tooltip.style.display = 'block';
             tooltip.innerText = "Improv";
         }
         else if (intersectedObject.name == "3") {
+            tooltip.style.display = 'block';
             tooltip.innerText = "Instagram";
         }
         else if (intersectedObject.name == "4") {
+            tooltip.style.display = 'block';
             tooltip.innerText = "Resume";
         }
         else if (intersectedObject.name == "5") {
+            tooltip.style.display = 'block';
             tooltip.innerText = "Art Gallery";
         }
         // console.log('Clicked on:', intersectedObject);
@@ -308,7 +315,6 @@ animate();
 function initSlider() {
     const slider = document.querySelector('.slider');
     function onPointerDown() {
-        // if ( event.isPrimary === false ) return;
         controls.enabled = false;
         window.addEventListener('pointermove', onPointerMove);
         window.addEventListener('pointerup', onPointerUp);
@@ -325,3 +331,19 @@ function initSlider() {
     slider.style.touchAction = 'none'; // disable touch scroll
     slider.addEventListener('pointerdown', onPointerDown);
 }
+let lastTouchTime = 0;
+const doubleTouchThreshold = 300; // Time in milliseconds
+window.addEventListener('touchstart', function (event) {
+    const currentTime = new Date().getTime();
+    // Check if the time between the last touch and this one is within the threshold
+    if (currentTime - lastTouchTime < doubleTouchThreshold) {
+        if (isUserAnimDone) {
+            document.getElementsByClassName('dialog-content')[0].style.display = "none";
+            spacePressed = true;
+            animStartedAt = Date.now();
+            isUserAnimDone = false;
+        }
+    }
+    // Update the last touch time
+    lastTouchTime = currentTime;
+});
