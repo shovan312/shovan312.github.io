@@ -378,13 +378,14 @@ function initSlider() {
 }
 
 let lastTouchTime = 0;
-const doubleTouchThreshold = 300; // Time in milliseconds
+const doubleTouchThresholdMax = 300; // Time in milliseconds
+const doubleTouchThresholdMin = 50; // Time in milliseconds
 
 window.addEventListener('touchstart', function(event) {
     const currentTime = new Date().getTime();
     
     // Check if the time between the last touch and this one is within the threshold
-    if (currentTime - lastTouchTime < doubleTouchThreshold) {
+    if (currentTime - lastTouchTime < doubleTouchThresholdMax && currentTime - lastTouchTime > doubleTouchThresholdMin ) {
         if(isUserAnimDone) {
             (document.getElementsByClassName('dialog-content')[0] as HTMLElement).style.display = "none"
             spacePressed = true
